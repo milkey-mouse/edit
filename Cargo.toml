@@ -1,0 +1,25 @@
+[package]
+name = "edit"
+description = "Open a file in the default text editor"
+authors = ["Milkey Mouse <milkeymouse@meme.institute>"]
+repository = "https://github.com/milkey-mouse/edit"
+keywords = ["editor", "edit", "editing", "cli"]
+categories = ["command-line-interface", "text-processing", "text-editors"]
+license = "CC0-1.0"
+version = "0.1.0"
+edition = "2018"
+
+[lib]
+name = "edit"
+
+[[bin]]
+name = "edit-example"
+path = "src/bin.rs"
+
+[features]
+default = ["better-path"]
+better-path = ["which"]
+
+[dependencies]
+tempfile = "3.1.0"
+which = { version = "3.1.0", default-features = false, optional = true }
