@@ -90,6 +90,7 @@ fn get_editor_args() -> Result<(PathBuf, Vec<String>)> {
     ENV_VARS
         .iter()
         .filter_map(env::var_os)
+        .filter(|v| !v.is_empty())
         .filter_map(|v| v.into_string().ok())
         .map(string_to_cmd)
         .filter(|(p, _)| check_editor(p))
