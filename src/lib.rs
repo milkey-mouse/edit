@@ -10,7 +10,7 @@
 //! println!("after editing: '{}'", edited);
 //! // after editing: 'Fill in the blank: Hello, world!'
 //! ```
-//! 
+//!
 //! [knows about]: ../src/edit/lib.rs.html#31-61
 
 use std::{
@@ -29,6 +29,7 @@ static ENV_VARS: &[&str] = &["VISUAL", "EDITOR"];
 
 // TODO: should we hardcode full paths as well in case $PATH is borked?
 #[cfg(not(any(target_os = "windows", target_os = "macos")))]
+#[rustfmt::skip]
 static HARDCODED_NAMES: &[&str] = &[
     // CLI editors
     "nano", "pico", "vim", "nvim", "vi", "emacs",
@@ -39,6 +40,7 @@ static HARDCODED_NAMES: &[&str] = &[
 ];
 
 #[cfg(target_os = "macos")]
+#[rustfmt::skip]
 static HARDCODED_NAMES: &[&str] = &[
     // CLI editors
     "nano", "pico", "vim", "nvim", "vi", "emacs",
@@ -51,6 +53,7 @@ static HARDCODED_NAMES: &[&str] = &[
 ];
 
 #[cfg(target_os = "windows")]
+#[rustfmt::skip]
 static HARDCODED_NAMES: &[&str] = &[
     // GUI editors
     "code.exe", "atom.exe", "subl.exe", "notepad++.exe",
@@ -203,7 +206,8 @@ pub fn edit<S: AsRef<[u8]>>(text: S) -> Result<String> {
 /// [`ErrorKind::InvalidData`]: https://doc.rust-lang.org/std/io/enum.ErrorKind.html#variant.InvalidData
 /// [`ErrorKind::NotFound`]: https://doc.rust-lang.org/std/io/enum.ErrorKind.html#variant.NotFound
 pub fn edit_with_builder<S: AsRef<[u8]>>(text: S, builder: &Builder) -> Result<String> {
-    String::from_utf8(edit_bytes_with_builder(text, builder)?).map_err(|_| Error::from(ErrorKind::InvalidData))
+    String::from_utf8(edit_bytes_with_builder(text, builder)?)
+        .map_err(|_| Error::from(ErrorKind::InvalidData))
 }
 
 /// Open the contents of a string or buffer in the [default editor] and return them as raw bytes.
