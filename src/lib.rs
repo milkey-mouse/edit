@@ -21,7 +21,7 @@ use std::{
     path::{Path, PathBuf},
     process::{Command, Stdio},
 };
-use tempfile::NamedTempFile;
+pub use tempfile::Builder;
 #[cfg(feature = "which")]
 use which::which;
 
@@ -167,7 +167,13 @@ pub fn get_editor() -> Result<PathBuf> {
 /// [`ErrorKind::InvalidData`]: https://doc.rust-lang.org/std/io/enum.ErrorKind.html#variant.InvalidData
 /// [`ErrorKind::NotFound`]: https://doc.rust-lang.org/std/io/enum.ErrorKind.html#variant.NotFound
 pub fn edit<S: AsRef<[u8]>>(text: S) -> Result<String> {
-    String::from_utf8(edit_bytes(text)?).map_err(|_| Error::from(ErrorKind::InvalidData))
+    let builder = Builder::new();
+    edit_with_builder(text, &builder)
+}
+
+/// TODO
+pub fn edit_with_builder<S: AsRef<[u8]>>(text: S, builder: &Builder) -> Result<String> {
+    String::from_utf8(edit_bytes_with_builder(text, builder)?).map_err(|_| Error::from(ErrorKind::InvalidData))
 }
 
 /// Open the contents of a string or buffer in the [default editor] and return them as raw bytes.
@@ -186,7 +192,13 @@ pub fn edit<S: AsRef<[u8]>>(text: S) -> Result<String> {
 /// [`edit`]: fn.edit.html
 /// [`String`]: https://doc.rust-lang.org/std/string/struct.String.html
 pub fn edit_bytes<B: AsRef<[u8]>>(buf: B) -> Result<Vec<u8>> {
-    let mut file = NamedTempFile::new()?;
+    let builder = Builder::new();
+    edit_bytes_with_builder(buf, &builder)
+}
+
+/// TODO
+pub fn edit_bytes_with_builder<B: AsRef<[u8]>>(buf: B, builder: &Builder) -> Result<Vec<u8>> {
+    let mut file = builder.tempfile()?;
     file.write(buf.as_ref())?;
 
     let path = file.into_temp_path();
