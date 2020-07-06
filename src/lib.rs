@@ -193,15 +193,15 @@ pub fn edit<S: AsRef<[u8]>>(text: S) -> Result<String> {
 /// # Returns
 ///
 /// If successful, returns the edited string.
-/// If the tempfile can't be created with the provided builder, may return any error returned by
-/// [`OpenOptions::open`].
+/// If the temporary file can't be created with the provided builder, may return any error returned
+/// by [`OpenOptions::open`].
 /// If the edited version of the file can't be decoded as UTF-8, returns [`ErrorKind::InvalidData`].
 /// If no text editor could be found, returns [`ErrorKind::NotFound`].
 /// Any errors related to spawning the editor process will also be passed through.
 ///
 /// [default editor]: fn.get_editor.html
 /// [`edit`]: fn.edit.html
-/// [`Builder`]: https://docs.rs/tempfile/3.1.0/tempfile/struct.Builder.html
+/// [`Builder`]: struct.Builder.html
 /// [`OpenOptions::open`]: https://doc.rust-lang.org/std/fs/struct.OpenOptions.html#errors
 /// [`ErrorKind::InvalidData`]: https://doc.rust-lang.org/std/io/enum.ErrorKind.html#variant.InvalidData
 /// [`ErrorKind::NotFound`]: https://doc.rust-lang.org/std/io/enum.ErrorKind.html#variant.NotFound
@@ -250,7 +250,7 @@ pub fn edit_bytes<B: AsRef<[u8]>>(buf: B) -> Result<Vec<u8>> {
 /// [default editor]: fn.get_editor.html
 /// [`edit_with_builder`]: fn.edit_with_builder.html
 /// [`String`]: https://doc.rust-lang.org/std/string/struct.String.html
-/// [`Builder`]: https://docs.rs/tempfile/3.1.0/tempfile/struct.Builder.html
+/// [`Builder`]: struct.Builder.html
 /// [`edit_bytes`]: fn.edit_bytes.html
 pub fn edit_bytes_with_builder<B: AsRef<[u8]>>(buf: B, builder: &Builder) -> Result<Vec<u8>> {
     let mut file = builder.tempfile()?;
