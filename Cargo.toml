@@ -6,7 +6,7 @@ repository = "https://github.com/milkey-mouse/edit"
 keywords = ["editor", "edit", "editing", "cli"]
 categories = ["command-line-interface", "config", "text-processing", "text-editors"]
 license = "CC0-1.0"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2018"
 
 [lib]
