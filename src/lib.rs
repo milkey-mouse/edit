@@ -44,11 +44,17 @@ static HARDCODED_NAMES: &[&str] = &[
 static HARDCODED_NAMES: &[&str] = &[
     // CLI editors
     "nano", "pico", "vim", "nvim", "vi", "emacs",
+    // open has a special flag to open in the default text editor
+    // (this really should come before the CLI editors, but in order
+    // not to break compatibility, we still prefer CLI over GUI)
+    "open -Wt",
     // GUI editors
-    "code", "atom", "subl", "gvim", "mate",
+    "code -w", "atom -w", "subl -w", "gvim", "mate",
     // Generic "file openers"
     "open -a TextEdit",
     "open -a TextMate",
+    // TODO: "open -f" reads input from standard input and opens with
+    // TextEdit. if this flag were used we could skip the tempfile
     "open",
 ];
 
