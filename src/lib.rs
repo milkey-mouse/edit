@@ -49,7 +49,7 @@ static HARDCODED_NAMES: &[&str] = &[
     // not to break compatibility, we still prefer CLI over GUI)
     "open -Wt",
     // GUI editors
-    "code -w", "atom -w", "subl", "gvim", "mate",
+    "code -w", "atom -w", "subl -w", "gvim", "mate",
     // Generic "file openers"
     "open -a TextEdit",
     "open -a TextMate",
