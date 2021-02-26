@@ -71,16 +71,20 @@ static HARDCODED_NAMES: &[&str] = &[
 ];
 
 #[cfg(feature = "better-path")]
-fn get_full_editor_path<T: AsRef<OsStr>>(binary_name: T) -> which::Result<PathBuf> {
-    which(binary_name)
+fn get_full_editor_path<T: AsRef<OsStr>>(binary_name: T) -> Result<PathBuf> {
+    let path = which(binary_name);
+    if path.is_ok(){
+        return Ok(path.unwrap());
+    }
+    Err(Error::from(ErrorKind::NotFound))
 }
 
 #[cfg(not(feature = "better-path"))]
-fn get_full_editor_path<T: AsRef<OsStr>>(binary_name: T) -> which::Result<PathBuf> {
+fn get_full_editor_path<T: AsRef<OsStr> + AsRef<std::path::Path>>(binary_name: T) -> Result<PathBuf> {
     if let Some(paths) = env::var_os("PATH") {
         for dir in env::split_paths(&paths) {
             if dir.join(&binary_name).is_file() {
-                Ok(dir.join(&binary_name))
+                return Ok(dir.join(&binary_name));
             }
         }
     }
