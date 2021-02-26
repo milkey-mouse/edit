@@ -62,7 +62,8 @@ static HARDCODED_NAMES: &[&str] = &[
 #[rustfmt::skip]
 static HARDCODED_NAMES: &[&str] = &[
     // GUI editors
-    "code.exe", "atom.exe", "subl.exe", "notepad++.exe",
+    "code.cmd -n -w", "atom.exe -w", "subl.exe -w",
+    // notepad++ does not block for input
     // Installed by default
     "notepad.exe",
     // Generic "file openers"
@@ -70,21 +71,21 @@ static HARDCODED_NAMES: &[&str] = &[
 ];
 
 #[cfg(feature = "better-path")]
-fn check_editor<T: AsRef<OsStr>>(binary_name: T) -> bool {
-    which(binary_name).is_ok()
+fn get_full_editor_path<T: AsRef<OsStr>>(binary_name: T) -> which::Result<PathBuf> {
+    which(binary_name)
 }
 
 #[cfg(not(feature = "better-path"))]
-fn check_editor<T: AsRef<OsStr>>(binary_name: T) -> bool {
+fn get_full_editor_path<T: AsRef<OsStr>>(binary_name: T) -> which::Result<PathBuf> {
     if let Some(paths) = env::var_os("PATH") {
         for dir in env::split_paths(&paths) {
             if dir.join(&binary_name).is_file() {
-                return true;
+                Ok(dir.join(&binary_name))
             }
         }
     }
 
-    false
+    Err(Error::from(ErrorKind::NotFound))
 }
 
 fn string_to_cmd(s: String) -> (PathBuf, Vec<String>) {
@@ -95,21 +96,28 @@ fn string_to_cmd(s: String) -> (PathBuf, Vec<String>) {
     )
 }
 
+fn get_full_editor_cmd(s: String)-> Result<(PathBuf, Vec<String>)>{
+    let (path, args) = string_to_cmd(s);
+    let result = get_full_editor_path(path);
+    if result.is_err(){
+        return Err(Error::from(ErrorKind::NotFound));
+    }
+    Ok((result.unwrap(),args))
+}
+
 fn get_editor_args() -> Result<(PathBuf, Vec<String>)> {
     ENV_VARS
         .iter()
         .filter_map(env::var_os)
         .filter(|v| !v.is_empty())
         .filter_map(|v| v.into_string().ok())
-        .map(string_to_cmd)
-        .filter(|(p, _)| check_editor(p))
+        .filter_map(|s|get_full_editor_cmd(s).ok())
         .next()
         .or_else(|| {
             HARDCODED_NAMES
                 .iter()
                 .map(|s| s.to_string())
-                .map(string_to_cmd)
-                .filter(|(p, _)| check_editor(p))
+                .filter_map(|s|get_full_editor_cmd(s).ok())
                 .next()
         })
         .ok_or_else(|| Error::from(ErrorKind::NotFound))
