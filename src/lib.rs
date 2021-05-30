@@ -98,11 +98,11 @@ fn string_to_cmd(s: String) -> (PathBuf, Vec<String>) {
 
 fn get_full_editor_cmd(s: String) -> Result<(PathBuf, Vec<String>)> {
     let (path, args) = string_to_cmd(s);
-    let result = get_full_editor_path(path);
-    if result.is_err() {
-        return Err(Error::from(ErrorKind::NotFound));
+    match get_full_editor_path(&path) {
+        Ok(result) => Ok((result, args)),
+        Err(_) if path.exists() => Ok((path, args)),
+        Err(_) => Err(Error::from(ErrorKind::NotFound))
     }
-    Ok((result.unwrap(), args))
 }
 
 fn get_editor_args() -> Result<(PathBuf, Vec<String>)> {
