@@ -17,7 +17,7 @@ use std::{
     env,
     ffi::OsStr,
     fs,
-    io::{Error, ErrorKind, Result, Write},
+    io::{Error, ErrorKind, Result, Write, Read},
     path::{Path, PathBuf},
     process::{Command, Stdio},
 };
@@ -244,6 +244,27 @@ pub fn edit_bytes<B: AsRef<[u8]>>(buf: B) -> Result<Vec<u8>> {
     edit_bytes_with_builder(buf, &builder)
 }
 
+/// Open the contents of a string or buffer in the [default editor]; if the user
+/// affirmatively saved the contents of the file, return them as raw bytes, otherwise
+/// return nothing.
+///
+/// # Arguments
+///
+/// `buf` is written to the temporary file before invoking the editor.
+///
+/// # Returns
+///
+/// If successful, and the user chose to save the file, returns the contents of 
+/// the temporary file in raw (`Vec<u8>`) form. If the user exited without saving,
+/// returns nothing.
+///
+/// [default editor]: fn.get_editor.html
+pub fn edit_bytes_tentative<B: AsRef<[u8]>>(buf: B) -> Result<Vec<u8>> {
+    let builder = Builder::new();
+    edit_bytes_with_builder_tentative(buf, &builder)
+}
+
+
 /// Open the contents of a string or buffer in the [default editor] using a temporary file with a
 /// custom path or filename and return them as raw bytes.
 ///
@@ -277,6 +298,42 @@ pub fn edit_bytes_with_builder<B: AsRef<[u8]>>(buf: B, builder: &Builder) -> Res
 
     path.close()?;
     Ok(edited)
+}
+
+/// Open the contents of a string or buffer in the [default editor] using a temporary file with a
+/// custom path or filename; if the user saves the text file, return the written bytes as a string.
+/// If the user exited the buffer without saving, return nothing.
+///
+/// # Arguments
+///
+/// `builder` is used to create a temporary file, potentially with a custom name, path, or prefix.
+///
+/// `buf` is written to the temporary file before invoking the editor.
+///
+/// # Returns
+///
+/// If successful, and the user affirmatively saved the buffer, returns the contents of the 
+/// temporary file in raw (`Vec<u8>`) form.
+///
+/// [default editor]: fn.get_editor.html
+/// [`Builder`]: struct.Builder.html
+/// [`edit_bytes`]: fn.edit_bytes.html
+pub fn edit_bytes_with_builder_tentative<B: AsRef<[u8]>>(buf: B, builder: &Builder) -> Result<Vec<u8>> {
+    let mut file = builder.tempfile()?;
+    file.write(buf.as_ref())?;
+
+    let modified_before = file.as_file().metadata()?.modified()?;
+    let path = file.into_temp_path();
+    edit_file(&path)?;
+
+    let mut edited = std::fs::File::open(&path)?;
+    let modified_after = edited.metadata()?.modified()?;
+    let mut buf = Vec::new();
+    if modified_before != modified_after {
+        edited.read_to_end(&mut buf)?;
+    }
+    path.close()?;
+    Ok(buf)
 }
 
 /// Open an existing file (or create a new one, depending on the editor's behavior) in the
