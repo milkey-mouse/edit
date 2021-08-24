@@ -127,7 +127,7 @@ fn get_editor_args() -> Result<(PathBuf, Vec<String>)> {
 ///
 /// This function checks several sources to find an editor binary (in order of precedence):
 ///
-/// - the `VISITOR` environment variable
+/// - the `VISUAL` environment variable
 /// - the `EDITOR` environment variable
 /// - hardcoded lists of common CLI editors on MacOS/Unix
 /// - hardcoded lists of GUI editors on Windows/MacOS/Unix
