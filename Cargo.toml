@@ -19,7 +19,9 @@ path = "src/bin.rs"
 [features]
 default = ["better-path"]
 better-path = ["which"]
+quoted-env = ["shell-words"]
 
 [dependencies]
+shell-words = { version = "1.1.0", optional = true }
 tempfile = "3.1.0"
 which = { version = "4.0", default-features = false, optional = true }

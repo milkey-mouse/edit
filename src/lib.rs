@@ -88,12 +88,27 @@ fn get_full_editor_path<T: AsRef<OsStr> + AsRef<Path>>(binary_name: T) -> Result
     Err(Error::from(ErrorKind::NotFound))
 }
 
+#[cfg(not(feature = "quoted-env"))]
 fn string_to_cmd(s: String) -> (PathBuf, Vec<String>) {
     let mut args = s.split_ascii_whitespace();
     (
         args.next().unwrap().into(),
         args.map(String::from).collect(),
     )
+}
+
+#[cfg(feature = "quoted-env")]
+fn string_to_cmd(s: String) -> (PathBuf, Vec<String>) {
+    match shell_words::split(&s) {
+        Ok(mut v) if !v.is_empty() => (v.remove(0).into(), v),
+        _ => {
+            let mut args = s.split_ascii_whitespace();
+            (
+                args.next().unwrap().into(),
+                args.map(String::from).collect(),
+            )
+        }
+    }
 }
 
 fn get_full_editor_cmd(s: String) -> Result<(PathBuf, Vec<String>)> {
@@ -268,7 +283,7 @@ pub fn edit_bytes<B: AsRef<[u8]>>(buf: B) -> Result<Vec<u8>> {
 /// [`edit_bytes`]: fn.edit_bytes.html
 pub fn edit_bytes_with_builder<B: AsRef<[u8]>>(buf: B, builder: &Builder) -> Result<Vec<u8>> {
     let mut file = builder.tempfile()?;
-    file.write(buf.as_ref())?;
+    file.write_all(buf.as_ref())?;
 
     let path = file.into_temp_path();
     edit_file(&path)?;
