@@ -12,10 +12,6 @@ edition = "2018"
 [lib]
 name = "edit"
 
-[[bin]]
-name = "edit-example"
-path = "src/bin.rs"
-
 [features]
 default = ["better-path"]
 better-path = ["which"]
