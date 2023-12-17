@@ -32,7 +32,7 @@ static ENV_VARS: &[&str] = &["VISUAL", "EDITOR"];
 #[rustfmt::skip]
 static HARDCODED_NAMES: &[&str] = &[
     // CLI editors
-    "nano", "pico", "vim", "nvim", "vi", "emacs",
+    "sensible-editor", "nano", "pico", "vim", "nvim", "vi", "emacs",
     // GUI editors
     "code", "atom", "subl", "gedit", "gvim",
     // Generic "file openers"
