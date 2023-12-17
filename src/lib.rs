@@ -12,6 +12,20 @@
 //! ```
 //!
 //! [knows about]: ../src/edit/lib.rs.html#31-61
+//!
+//! Features
+//! ========
+//!
+//! The `edit` crate has the following optional features:
+//!
+//! - `better-path` *(enabled by default)* — Use
+//!   [`which`](https://docs.rs/which) to locate executable programs in `PATH`.
+//!   If this is disabled, programs are still looked up in `PATH`, but a basic
+//!   search is used that does not check for executability.
+//!
+//! - `quoted-env` — Use [`shell-words`](https://docs.rs/shell-words) to split
+//!   apart the values of the `VISUAL` and `EDITOR` environment variables.  If
+//!   this is disabled, the envvars are split up on whitespace.
 
 use std::{
     env,
